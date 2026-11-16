@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -21,13 +22,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ch.xlan.android17.model.Business
+import ch.xlan.android17.model.decodeBusiness
 import ch.xlan.android17.time.ClockState
 import ch.xlan.android17.ui.BusinessView
 import ch.xlan.android17.ui.ClockView
 
 @Composable
-fun App(business: Business, clock: ClockState, onExport: (Business) -> String) {
+fun App(
+    business: Business,
+    clock: ClockState,
+    onExport: (Business) -> String,
+    onImport: () -> String,
+) {
+    var displayed by remember { mutableStateOf(business) }
     var status by remember { mutableStateOf<String?>(null) }
+    val showingOther = displayed != business
 
     MaterialTheme {
         Surface(Modifier.fillMaxSize()) {
@@ -36,7 +45,7 @@ fun App(business: Business, clock: ClockState, onExport: (Business) -> String) {
                 verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
                 ClockView(clock)
-                BusinessView(business)
+                BusinessView(displayed)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -48,8 +57,26 @@ fun App(business: Business, clock: ClockState, onExport: (Business) -> String) {
                     }) {
                         Text("Exporter")
                     }
-                    status?.let { Text(it, style = MaterialTheme.typography.body2) }
+                    OutlinedButton(onClick = {
+                        status = runCatching { decodeBusiness(onImport()) }
+                            .onSuccess { displayed = it }
+                            .fold(
+                                onSuccess = { "Importé : ${it.id} ${it.name}" },
+                                onFailure = { "Échec de l'import : ${it.message?.lineSequence()?.first()}" },
+                            )
+                    }) {
+                        Text("Importer")
+                    }
+                    if (showingOther) {
+                        OutlinedButton(onClick = {
+                            displayed = business
+                            status = null
+                        }) {
+                            Text("Ma BP")
+                        }
+                    }
                 }
+                status?.let { Text(it, style = MaterialTheme.typography.body2) }
             }
         }
     }

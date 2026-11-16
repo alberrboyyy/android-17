@@ -8,6 +8,7 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import ch.xlan.android17.data.android17
 import ch.xlan.android17.data.businessFile
+import ch.xlan.android17.data.readClipboardText
 import ch.xlan.android17.data.saveBusiness
 import ch.xlan.android17.time.ClockState
 import ch.xlan.android17.time.MqttConfig
@@ -33,10 +34,15 @@ fun main() {
             title = "Android 17",
             state = rememberWindowState(width = 900.dp, height = 800.dp),
         ) {
-            App(business, clock, onExport = {
-                saveBusiness(it)
-                businessFile.toString()
-            })
+            App(
+                business,
+                clock,
+                onExport = {
+                    saveBusiness(it)
+                    businessFile.toString()
+                },
+                onImport = ::readClipboardText,
+            )
         }
     }
 }

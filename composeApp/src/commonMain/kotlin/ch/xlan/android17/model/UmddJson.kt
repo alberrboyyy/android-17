@@ -9,3 +9,5 @@ val UmddJson = Json {
 }
 
 fun Business.toJson(): String = UmddJson.encodeToString(Business.serializer(), this)
+
+fun decodeBusiness(text: String): Business = UmddJson.decodeFromString(Business.serializer(), text)
