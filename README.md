@@ -1,5 +1,16 @@
 # android17
 
+## Heure commune (MQTT)
+
+L'app affiche l'heure diffusée par la source de temps UMDD (`{"UnixTimeStamp": int}`).
+
+```sh
+cp .env.example .env
+```
+
+Puis renseigner `MQTT_USER` et `MQTT_PASSWORD` (communiqués sur Discord) dans `.env`.
+Pour utiliser une source de secours, changer `MQTT_TOPIC` (`umddcmid3b/timebackup`, `umddcmid3b/timebackup2`).
+
 ## Crédits images
 
 - Logo : « Android 17 Developer Preview Logo », Google, CC BY 2.5,

@@ -21,10 +21,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ch.xlan.android17.model.Business
+import ch.xlan.android17.time.ClockState
 import ch.xlan.android17.ui.BusinessView
+import ch.xlan.android17.ui.ClockView
 
 @Composable
-fun App(business: Business, onExport: (Business) -> String) {
+fun App(business: Business, clock: ClockState, onExport: (Business) -> String) {
     var status by remember { mutableStateOf<String?>(null) }
 
     MaterialTheme {
@@ -33,6 +35,7 @@ fun App(business: Business, onExport: (Business) -> String) {
                 modifier = Modifier.verticalScroll(rememberScrollState()).padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp),
             ) {
+                ClockView(clock)
                 BusinessView(business)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
