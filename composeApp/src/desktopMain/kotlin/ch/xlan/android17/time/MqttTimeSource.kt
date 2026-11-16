@@ -1,5 +1,6 @@
 package ch.xlan.android17.time
 
+import ch.xlan.android17.contract.decodeTimestamp
 import com.hivemq.client.mqtt.MqttClient
 import com.hivemq.client.mqtt.datatypes.MqttQos
 import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient
@@ -48,11 +49,11 @@ class MqttTimeSource(private val config: MqttConfig) {
 
     private fun onMessage(publish: Mqtt3Publish) {
         val text = publish.payloadAsBytes.decodeToString()
-        val message = decodeTimeMessage(text)
-        if (message == null) {
+        val timestamp = decodeTimestamp(text)
+        if (timestamp == null) {
             System.err.println("Message time invalide ignoré sur ${publish.topic} : $text")
             return
         }
-        _state.value = ClockState.Synced(message.unixTimeStamp)
+        _state.value = ClockState.Synced(timestamp)
     }
 }
