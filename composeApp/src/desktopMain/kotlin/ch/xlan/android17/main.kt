@@ -19,7 +19,7 @@ fun main() {
     val business = android17()
 
     val config = MqttConfig.load()
-    val timeSource = config.getOrNull()?.let(::MqttTimeSource)?.apply { start() }
+    val timeSource = config.getOrNull()?.let { MqttTimeSource(it, business.id) }?.apply { start() }
     val clockFlow = timeSource?.state
         ?: MutableStateFlow(ClockState.Unavailable(config.exceptionOrNull()?.message ?: "configuration MQTT invalide"))
 

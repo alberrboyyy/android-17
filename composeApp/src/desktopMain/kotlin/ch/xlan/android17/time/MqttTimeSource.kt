@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.util.UUID
 
-class MqttTimeSource(private val config: MqttConfig) {
+class MqttTimeSource(private val config: MqttConfig, private val node: String) {
     private val _state = MutableStateFlow<ClockState>(ClockState.Connecting)
     val state: StateFlow<ClockState> = _state.asStateFlow()
 
@@ -49,11 +49,8 @@ class MqttTimeSource(private val config: MqttConfig) {
 
     private fun onMessage(publish: Mqtt3Publish) {
         val text = publish.payloadAsBytes.decodeToString()
-        val timestamp = decodeTimestamp(text)
-        if (timestamp == null) {
-            System.err.println("Message time invalide ignoré sur ${publish.topic} : $text")
-            return
-        }
-        _state.value = ClockState.Synced(timestamp)
+        decodeTimestamp(text, node)
+            .onSuccess { _state.value = ClockState.Synced(it) }
+            .onFailure { System.err.println("Message ignoré sur ${publish.topic} (${it.message?.lineSequence()?.first()}) : $text") }
     }
 }
